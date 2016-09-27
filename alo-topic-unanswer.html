@@ -1,0 +1,163 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../iron-icons/device-icons.html">
+<link rel="import" href="../iron-icons/communication-icons.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../paper-card/paper-card.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-toast/paper-toast.html">
+
+<dom-module id="alo-topic-unanswer">
+    <template id="list-topic">
+        <style is="custom-style">
+
+            paper-card.topic {
+                @apply(--layout-horizontal);
+                margin: 15px 0;
+                color:#444;
+            }
+            h2 {
+                @apply(--paper-font-display1);
+                font-weight: 300;
+                color:#444;
+            }
+            .topic-image {
+                width: 100px;
+                height: 100px;
+                background-size: cover;
+                float: left;
+                margin-right: 12px;
+            }
+            .topic-content {
+              @apply(--layout-flex);
+              float: left;
+            }
+            .topic-header {
+                padding: 12px 12px 0;
+                position: relative;
+            }
+            .topic-header .topic-title{@apply(--paper-font-headline);}
+            .topic-name { @apply(--paper-font-subhead); color: var(--paper-grey-600); margin: 8px 0; }
+            .topic-icon {
+                font-size: 11px;
+            }
+            .card-content {@apply(--paper-font-subhead);}
+            .card-actions {
+                text-align: right;
+            }
+
+            iron-icon {
+                --iron-icon-fill-color: #4285f4;
+                --iron-icon-height: 20px;
+                --iron-icon-width: 20px;
+            }
+
+            iron-icon:last-child {
+                padding-left: 8px;
+            }
+            paper-button{
+                @apply(--paper-font-body2);
+            }
+            paper-button a{
+                text-decoration: none;
+                color:#4285f4;
+            }
+            paper-button.colorful {
+              color:#4285f4;
+            }
+            paper-button[raised].colorful {
+              background:#4285f4;color:#fff
+            }
+
+        </style>
+
+        <h2>{{headTitle}}</h2>
+
+        <iron-ajax id="pickupAJAX" on-response="pickupComplete"></iron-ajax>
+
+        <iron-ajax
+            auto id="getStagesAJAX"
+            url="/api/topics/list_unaswered"
+            headers='{ "Content-Type": "application/x-www-form-urlencoded", "Authorization": "Token token=A1zaSyAuecDZ9xJRb6DkQYWBmYrtzOGJD-iD5gI" }'
+            method="POST"
+            handle-as="json"
+            last-response="{{ajaxResponse}}">
+        </iron-ajax>
+
+            <template is="dom-repeat" items="[[ajaxResponse.data]]">
+                <paper-card class="topic">
+                  <div class="topic-content">
+                    <div class="topic-image" style="background:url('[[item.author_image]]')"></div>
+                    <div class="topic-header">
+                        <div class="topic-title">[[item.title]]</div>
+                        <div class="topic-name">By [[item.username]]</div>
+                        <div class="topic-icon">
+                            <iron-icon icon="device:access-time"></iron-icon> [[item.date]]
+                            <iron-icon icon="communication:chat-bubble"></iron-icon> [[item.reply]]
+                        </div>
+
+                    </div>
+                    <div class="card-content">[[item.excerpt]] ...</div>
+                    <div class="card-actions">
+                            <paper-button tabindex="0" class="colorful">
+                                <a href="/komunitas/topic/[[item.permalink]]">detail</a>
+                            </paper-button>
+                        <paper-button tabindex="0" raised class="colorful" on-click="pickupStage">pick up</paper-button>
+                    </div>
+                  </div>
+                </paper-card>
+            </template>
+        <paper-toast id="responseToastSuccess"><iron-icon icon="icons:check" style="fill:#4caf50"></iron-icon> {{messageSuccess}}</paper-toast>
+        <paper-toast id="responseToastFailed"><iron-icon icon="icons:close" style="fill:#f44336"></iron-icon> {{messageFailed}}</paper-toast>
+        </template>
+
+    <script>
+        Polymer({
+            is: 'alo-topic-unanswer',
+            properties: {
+                headTitle: {
+                    type: String,
+                    value: "Topic unanswer"
+                },
+                messageSuccess: {
+                    type: String,
+                    value: "Success Pick up"
+                },
+                messageFailed: {
+                    type: String,
+                    value: "Failed, Already Pick up"
+                },
+            },
+            showToast: function() {
+                // this.$.responseToastFailed.text = aMessage;
+                this.$.responseToastFailed.show();
+            },
+
+            refreshData: function() {
+                this.$.getStagesAJAX.generateRequest();
+                console.log("Refresh Data");
+            },
+            pickupStage: function(aElement) {
+                console.log("Pick Up id Topic : " +aElement.model.item.id);
+
+                this.$.pickupAJAX.params = { "post_id": aElement.model.item.id };
+                this.$.pickupAJAX.headers = { "Content-Type": "application/x-www-form-urlencoded", "Authorization": "Token token=A1zaSyAuecDZ9xJRb6DkQYWBmYrtzOGJD-iD5gI" };
+                this.$.pickupAJAX.url = "/api/topics/pickup";
+                this.$.pickupAJAX.method = "POST";
+                this.$.pickupAJAX.contentType="application/json";
+                this.$.pickupAJAX.generateRequest();
+            },
+            pickupComplete: function() {
+                if(this.$.pickupAJAX.lastResponse.status == 'success') {
+                    this.$.responseToastSuccess.show();
+                } else {
+                    this.$.responseToastFailed.show();
+                }
+                this.refreshData();
+                console.log(this.$.pickupAJAX.lastResponse);
+            }
+        });
+    </script>
+</dom-module>

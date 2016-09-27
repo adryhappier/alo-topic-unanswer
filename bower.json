@@ -1,0 +1,34 @@
+{
+  "name": "alo-topic-unanswer",
+  "version": "0.0.8",
+  "authors": [
+    "Adry Andreas <adryhappier@gmail.com>"
+  ],
+  "description": "Polymer list Card for show Topic unanswer on alodokter.com",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "alodokter"
+  ],
+  "main": "alo-topic-unanswer.html",
+  "license": "http://polymer.github.io/LICENSE.txt",
+  "homepage": "https://github.com/adryhappier/alo-topic-unanswer/",
+  "ignore": [
+    "/.*",
+    "/test/",
+    "/demo/"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.0.0",
+    "paper-card": "PolymerElements/paper-card#^1.1.1",
+    "paper-button": "PolymerElements/paper-button#^1.0.11",
+    "paper-toast": "PolymerElements/paper-toast#^1.3.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.4.3",
+    "iron-icons": "PolymerElements/iron-icons#^1.1.3"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "web-component-tester": "*"
+  }
+}
